@@ -9,12 +9,28 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    loadChildren: './home/home.module#HomePageModule'
+    loadChildren: './pg-home/pg-home.module#PgHomePageModule'
   },
   {
-    path: 'list',
-    loadChildren: './list/list.module#ListPageModule'
-  }
+    path: 'card-list',
+    loadChildren: './pg-card-list/pg-card-list.module#PgCardListPageModule'
+  },
+  {
+    path: 'decks',
+    loadChildren: './pg-decks/pg-decks.module#PgDecksPageModule'
+  },
+  {
+    path: 'collection',
+    loadChildren: './pg-collection/pg-collection.module#PgCollectionPageModule'
+  },
+  {
+    path: 'life-counter',
+    loadChildren: './pg-life-counter/pg-life-counter.module#PgLifeCounterPageModule'
+  },
+  {
+    path: 'about',
+    loadChildren: './pg-about/pg-about.module#PgAboutPageModule'
+  },
 ];
 
 @NgModule({

@@ -16,9 +16,29 @@ export class AppComponent {
       icon: 'home'
     },
     {
-      title: 'List',
-      url: '/list',
-      icon: 'list'
+      title: 'Card List',
+      url: '/card-list',
+      icon: 'apps'
+    },
+    {
+      title: 'Decks',
+      url: '/decks',
+      icon: 'cube'
+    },
+    {
+      title: 'Collection',
+      url: '/collection',
+      icon: 'folder'
+    },
+    {
+      title: 'Life Counter',
+      url: '/life-counter',
+      icon: 'heart'
+    },
+    {
+      title: 'About',
+      url: '/about',
+      icon: 'information-circle-outline'
     }
   ];
 
@@ -32,7 +52,10 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
+      this.statusBar.overlaysWebView(true);
+      this.statusBar.styleLightContent();
+      this.statusBar.backgroundColorByHexString('#ffffff');
+
       this.splashScreen.hide();
     });
   }

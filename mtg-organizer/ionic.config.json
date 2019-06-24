@@ -1,5 +1,7 @@
 {
   "name": "mtg-organizer",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

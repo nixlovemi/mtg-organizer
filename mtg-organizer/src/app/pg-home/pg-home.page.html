@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button class="menu-toolbar-default"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Home
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row align-items-start>
+      <ion-col size="12">
+        <fieldset>
+          <legend>My Decks</legend>
+          <ion-grid>
+            <ion-row align-items-start>
+              <ion-col size="12">
+                <ion-item *ngFor="let d of vDecks" (click)="viewDeck(d.id)" detail>
+                  <ion-label>
+                    <h2 class="my-deck-title">
+                      {{d.title}}
+                    </h2>
+                    <p>
+                      <abbr *ngIf="d.white_sym == true" class="card-symbol card-symbol-W" title="one white mana"></abbr>
+                      <abbr *ngIf="d.blue_sym == true" class="card-symbol card-symbol-U" title="one blue mana"></abbr>
+                      <abbr *ngIf="d.black_sym == true" class="card-symbol card-symbol-B" title="one black mana"></abbr>
+                      <abbr *ngIf="d.red_sym == true" class="card-symbol card-symbol-R" title="one red mana"></abbr>
+                      <abbr *ngIf="d.green_sym == true" class="card-symbol card-symbol-G" title="one green mana"></abbr>
+                      <abbr *ngIf="d.colorless_sym == true" class="card-symbol card-symbol-C" title="one colorless mana"></abbr>
+                      |
+                      {{d.format}}
+                    </p>
+                    <p>
+                      CMC: {{d.cmc}}
+                      |
+                      Main: {{d.main}}
+                      |
+                      Side: {{d.side}}
+                    </p>
+                  </ion-label>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </fieldset>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
