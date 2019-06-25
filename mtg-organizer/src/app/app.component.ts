@@ -3,6 +3,9 @@ import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { TbSetService } from './TbSet/tb-set.service';
+import { File } from '@ionic-native/file/ngx';
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'app-root',
@@ -41,22 +44,44 @@ export class AppComponent {
       icon: 'information-circle-outline'
     }
   ];
+  isApp = false;
 
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    public TbSet: TbSetService,
+    private file: File,
+    public storage: Storage,
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
+      this.isApp = (!document.URL.startsWith('http') || document.URL.startsWith('http://localhost:8080'));
+
       this.statusBar.overlaysWebView(true);
       this.statusBar.styleLightContent();
       this.statusBar.backgroundColorByHexString('#ffffff');
 
+      this.checkFirstTimeDb();
       this.splashScreen.hide();
+    });
+  }
+
+  checkFirstTimeDb(){
+    this.checkJsonTbSet();
+  }
+
+  checkJsonTbSet(){
+    this.TbSet.getJsonTbSet().then((jsonTbSet) => {
+      this.storage.set('tb_set', jsonTbSet);
+      if(this.isApp){
+        this.file.removeFile('../assets/data/', 'sets.json').then( data => {
+          console.log('removeu');
+        });
+      }
     });
   }
 }

@@ -19,7 +19,7 @@
             <ion-row align-items-start>
               <ion-col size="12">
                 <ion-item *ngFor="let d of vDecks" (click)="viewDeck(d.id)" detail>
-                  <ion-label>
+                  <ion-label text-wrap>
                     <h2 class="my-deck-title">
                       {{d.title}}
                     </h2>
@@ -42,6 +42,81 @@
                     </p>
                   </ion-label>
                 </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="12">
+                <ion-button fill="outline" class="collection-open-button">View All</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </fieldset>
+      </ion-col>
+    </ion-row>
+
+    <ion-row align-items-start>
+      <ion-col size="12">
+        <fieldset>
+          <legend>My Collection</legend>
+          <ion-grid>
+            <ion-row align-items-start>
+              <ion-col size="12">
+                <ion-item>
+                  <ion-thumbnail slot="start">
+                    <ion-icon style="font-size: 60px;" name="folder"></ion-icon>
+                  </ion-thumbnail>
+                  <ion-label text-wrap>
+                    <h3>Pauper Binder</h3>
+                    <p>Cards: 458</p>
+                  </ion-label>
+                  <ion-button fill="outline" slot="end" class="collection-open-button">Open</ion-button>
+                </ion-item>
+              </ion-col>
+              <ion-col size="12">
+                <ion-item>
+                  <ion-thumbnail slot="start">
+                    <ion-icon style="font-size: 60px;" name="folder"></ion-icon>
+                  </ion-thumbnail>
+                  <ion-label>
+                    <h3>All Cards Binder</h3>
+                    <p>Cards: 1.897</p>
+                  </ion-label>
+                  <ion-button fill="outline" slot="end" class="collection-open-button">Open</ion-button>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="12">
+                <ion-button fill="outline" class="collection-open-button">View All</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </fieldset>
+      </ion-col>
+    </ion-row>
+
+    <ion-row align-items-start>
+      <ion-col size="12">
+        <fieldset>
+          <legend>Magic Sets</legend>
+          <ion-grid>
+            <ion-row align-items-start *ngFor="let s of vSets">
+              <ion-col size="12">
+                <ion-item>
+                  <ion-thumbnail slot="start">
+                    <img src="{{s.url_icon}}" />
+                  </ion-thumbnail>
+                  <ion-label text-wrap>
+                    <h3>{{s.name}}</h3>
+                    <p>Cards: {{s.card_count}}</p>
+                  </ion-label>
+                  <ion-button fill="outline" slot="end" class="collection-open-button">View</ion-button>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngIf="vShowMoreSets == true">
+              <ion-col size="12">
+                <ion-button fill="outline" class="collection-open-button" (click)="updateSets()">View All</ion-button>
               </ion-col>
             </ion-row>
           </ion-grid>
