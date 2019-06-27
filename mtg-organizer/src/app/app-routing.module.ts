@@ -31,7 +31,14 @@ const routes: Routes = [
     path: 'about',
     loadChildren: './pg-about/pg-about.module#PgAboutPageModule'
   },
-  { path: 'pg-set-list', loadChildren: './pg-set-list/pg-set-list.module#PgSetListPageModule' },
+  {
+    path: 'set-list',
+    loadChildren: './pg-set-list/pg-set-list.module#PgSetListPageModule'
+  },
+  {
+    path: 'set-details',
+    loadChildren: './pg-set-details/pg-set-details.module#PgSetDetailsPageModule'
+  },
 ];
 
 @NgModule({

@@ -1,9 +1,27 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>pg-set-list</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button class="menu-toolbar-default" defaultHref="home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Set List</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <ion-searchbar (ionChange)="filterList($event)" placeholder="Filter Set"></ion-searchbar>
 
+  <div text-center *ngIf="vShowLoader == true">
+    <ion-spinner text-center name="crescent"></ion-spinner>
+  </div>
+
+  <ion-item *ngFor="let s of vSets" detail (click)="detailSet(s.id)">
+    <ion-thumbnail slot="start">
+      <img src="{{s.url_icon}}" />
+    </ion-thumbnail>
+    <ion-label text-wrap>
+      <h3>{{s.name}}</h3>
+      <p>Cards: {{s.card_count}}</p>
+      <p>Released At: {{s.release_dt}}</p>
+    </ion-label>
+  </ion-item>
 </ion-content>

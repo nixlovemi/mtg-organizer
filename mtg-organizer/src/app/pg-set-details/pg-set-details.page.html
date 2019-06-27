@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button class="menu-toolbar-default" defaultHref="set-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="title">{{vSetName}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row>
+    <ion-col size="6" align-self-center text-center *ngFor="let c of vSetCards">
+      <img (click)="showImage(c.img_path, c.name)" src="{{c.img_path}}" />
+    </ion-col>
+  </ion-row>
+</ion-content>

@@ -11,10 +11,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
 import { File } from '@ionic-native/file/ngx';
+import { ImageViewerComponent } from './component/image-viewer/image-viewer.component';
 
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
+  declarations: [AppComponent, ImageViewerComponent],
+  entryComponents: [ImageViewerComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
