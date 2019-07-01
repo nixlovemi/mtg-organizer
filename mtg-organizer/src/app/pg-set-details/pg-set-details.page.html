@@ -7,10 +7,31 @@
   </ion-toolbar>
 </ion-header>
 
+<!--
+car_layout
+==========
+planar
+token
+host
+split
+saga
+augment
+double_faced_token
+scheme
+normal
+emblem
+vanguard
+leveler
+transform
+meld
+flip
+-->
+
 <ion-content>
   <ion-row>
     <ion-col size="6" align-self-center text-center *ngFor="let c of vSetCards">
-      <img (click)="showImage(c.img_path, c.name)" src="{{c.img_path}}" />
+      <!--<img (click)="showImage(c.img_path, c.name)" src="{{c.img_path}}" />-->
+      <div [innerHTML]="c.html" (click)="showImage(c.id, c.name)"></div>
     </ion-col>
   </ion-row>
 </ion-content>

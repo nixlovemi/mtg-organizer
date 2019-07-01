@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { TbCardsService } from '../../TbCards/tb-cards.service';
 
 @Component({
   selector: 'app-image-viewer',
@@ -11,13 +12,22 @@ export class ImageViewerComponent implements OnInit {
   @Input() imgTitle = '';
   @Input() imgDescription = '';
 
+  htmlCard  = '';
   slideOpts = {
     centeredSlides: 'true'
   };
 
-  constructor(private modalController: ModalController) {}
+  constructor(
+    private modalController: ModalController,
+    private TbCards: TbCardsService,
+  ) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    var cardId = this.imgSource; //cardID or image path
+    this.TbCards.getHtmlCardId(cardId, 'large').then((htmlCard:any) => {
+      this.htmlCard = htmlCard;
+    });
+  }
 
   closeModal() {
     this.modalController.dismiss();

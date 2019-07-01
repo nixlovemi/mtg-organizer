@@ -13,22 +13,6 @@ export class TbSetService {
     public http: Http,
   ) { }
 
-  getJsonTbSet(){
-    return new Promise(
-    (resolve, reject) => {
-      this.http.get("../../assets/data/sets.json")
-      .subscribe((data) => {
-        let jsonRet;
-        jsonRet = JSON.parse(data["_body"]);
-        resolve(jsonRet);
-      },
-      (error) => {
-        var TbSet = [];
-        reject(JSON.stringify(TbSet));
-      });
-    });
-  }
-
   getAllSets(limit=5, filter=''){
     return new Promise(
     (resolve, reject) => {
@@ -38,7 +22,8 @@ export class TbSetService {
       };
       let arraySets = [];
 
-      this.storage.get('tb_set').then((jsonSet) => {
+      fetch('../../assets/data/sets.json').then(res => res.json())
+      .then(jsonSet => {
         /*function date_sort(a, b) {
           return new Date(b.set_released_at).getTime() - new Date(a.set_released_at).getTime();
         }
@@ -87,7 +72,8 @@ export class TbSetService {
   getSet(setId){
     return new Promise(
     (resolve, reject) => {
-      this.storage.get('tb_set').then((jsonSet) => {
+      fetch('../../assets/data/sets.json').then(res => res.json())
+      .then(jsonSet => {
         var Set = jsonSet[setId];
         if(typeof Set == 'undefined'){
           reject("Set ID does not exists!");
@@ -97,6 +83,18 @@ export class TbSetService {
       })
       .catch((err) => {
         reject('Error fetching Set! Message:' + err);
+      });
+    });
+  }
+
+  getSetCards(setId){
+    return new Promise(
+    (resolve, reject) => {
+      fetch('../../assets/data/set_cards.json').then(res => res.json()).then(jsonSetCards => {
+        resolve(jsonSetCards[setId]);
+      })
+      .catch(err => {
+        reject(err);
       });
     });
   }

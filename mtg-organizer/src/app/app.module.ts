@@ -21,7 +21,7 @@ import { ImageViewerComponent } from './component/image-viewer/image-viewer.comp
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpModule,
-    IonicStorageModule.forRoot({ name: '__mydb', driverOrder: ['indexeddb', 'sqlite', 'websql'] }),
+    IonicStorageModule.forRoot({ name: '__mydb', driverOrder: ['sqlite', 'websql', 'indexeddb'] }),
   ],
   providers: [
     StatusBar,

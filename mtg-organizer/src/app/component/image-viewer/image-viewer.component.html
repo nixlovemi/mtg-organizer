@@ -10,7 +10,11 @@
 <ion-content [forceOverscroll]="false" color="light" fullscreen="true">
   <ion-slides [options]="slideOpts">
     <ion-slide>
-      <div class="swiper-zoom-container"><img [src]="imgSource" height="100vh" /></div>
+      <div *ngIf="htmlCard != ''" [innerHTML]="htmlCard"></div>
+
+      <div *ngIf="htmlCard == ''" class="swiper-zoom-container">
+        <img [src]="imgSource" height="100vh" />
+      </div>
     </ion-slide>
   </ion-slides>
 </ion-content>

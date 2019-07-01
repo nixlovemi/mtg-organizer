@@ -110,7 +110,7 @@
                     <h3>{{s.name}}</h3>
                     <p>Cards: {{s.card_count}}</p>
                   </ion-label>
-                  <ion-button fill="outline" slot="end" class="collection-open-button">View</ion-button>
+                  <ion-button fill="outline" slot="end" class="collection-open-button" (click)="detailSet(s.id)">View</ion-button>
                 </ion-item>
               </ion-col>
             </ion-row>

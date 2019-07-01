@@ -4,6 +4,9 @@ import { TbSetService } from '../TbSet/tb-set.service';
 import { File } from '@ionic-native/file/ngx';
 import { ModalController } from '@ionic/angular';
 import { ImageViewerComponent } from '../component/image-viewer/image-viewer.component';
+import { TbCardsService } from '../TbCards/tb-cards.service';
+import { LoadingController } from '@ionic/angular';
+import { GlobalsService } from '../globals.service';
 
 @Component({
   selector: 'app-pg-set-details',
@@ -19,9 +22,12 @@ export class PgSetDetailsPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    public TbSet: TbSetService,
+    private TbSet: TbSetService,
     private file: File,
-    public modalController: ModalController,
+    private modalController: ModalController,
+    private TbCard: TbCardsService,
+    private loadingCtr: LoadingController,
+    private globalServ: GlobalsService,
   ) {
     this.route.queryParams.subscribe(params => {
       if (this.router.getCurrentNavigation().extras.state) {
@@ -32,19 +38,57 @@ export class PgSetDetailsPage implements OnInit {
         });
       }
     });
-
-    var card = {
-      "img_path" : "../../assets/card_images/8f1b1d5c-f71e-4c68-8baf-c134e42ed6f2-1.jpg",
-      "name" : "Chandra's Regulator",
-    };
-    this.vSetCards.push(card);
-    this.vSetCards.push(card);
-    this.vSetCards.push(card);
-    this.vSetCards.push(card);
-    this.vSetCards.push(card);
   }
 
   ngOnInit() {
+  }
+
+  ionViewDidEnter(){
+    this.loadingCtr.create({
+      message: 'Loading, please wait',
+      spinner: 'dots',
+    }).then((res) => {
+      res.present();
+
+      var vSetId = '-1';
+      if(typeof this.Set != 'undefined'){
+        vSetId = this.Set.set_id;
+      }
+
+      this.loadCardsBySet(vSetId).then((ret) => {
+        res.dismiss();
+      })
+      .catch((ret) => {
+        res.dismiss();
+      });
+
+      res.onDidDismiss().then((dis) => { });
+    });
+  }
+
+  loadCardsBySet(vSetId){
+    return new Promise(
+    (resolve, reject) => {
+      let arrCards = this.globalServ.getArrCards();
+
+      this.TbSet.getSetCards(vSetId).then((arrSetCards:any) => {
+        for(var i=0; i<arrSetCards.length; i++){
+          let cardId = arrSetCards[i];
+          this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
+            var infoCard = {
+              id   : cardId,
+              name : arrCards[cardId].car_name,
+              html : htmlCard,
+            };
+            this.vSetCards.push(infoCard);
+          });
+        }
+        resolve(true);
+      })
+      .catch((err) => {
+        reject(false);
+      });
+    });
   }
 
   async showImage(url, cardName, description: string = '') {

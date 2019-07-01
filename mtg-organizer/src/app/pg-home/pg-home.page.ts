@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { Storage } from '@ionic/storage';
 import { UtilsService } from '../utils.service';
 import { TbSetService } from '../TbSet/tb-set.service';
+import { Router, NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-pg-home',
@@ -20,12 +21,13 @@ export class PgHomePage implements OnInit {
     public storage: Storage,
     public utils: UtilsService,
     public TbSet: TbSetService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
   }
 
-  ionViewWillEnter(){
+  ionViewDidEnter(){
     var deck1 = {
       "id":1,
       "format":"standard",
@@ -70,5 +72,14 @@ export class PgHomePage implements OnInit {
 
   viewDeck(deckId){
     console.log(deckId);
+  }
+
+  detailSet(setId){
+    let navigationExtras: NavigationExtras = {
+      state: {
+        setId: setId
+      }
+    };
+    this.router.navigate(['set-details'], navigationExtras);
   }
 }
