@@ -7,6 +7,10 @@ import { ImageViewerComponent } from '../component/image-viewer/image-viewer.com
 import { TbCardsService } from '../TbCards/tb-cards.service';
 import { LoadingController } from '@ionic/angular';
 import { GlobalsService } from '../globals.service';
+import { Http, Response, Headers, RequestOptions, RequestMethod, ResponseContentType } from '@angular/http';
+import { UtilsService } from '../utils.service';
+import { saveAs } from 'file-saver';
+import { Zip } from '@ionic-native/zip/ngx';
 
 @Component({
   selector: 'app-pg-set-details',
@@ -16,8 +20,10 @@ import { GlobalsService } from '../globals.service';
 export class PgSetDetailsPage implements OnInit {
 
   Set: any;
-  vSetName = '';
+  vSetName  = '';
   vSetCards = [];
+  vIsApp    = false;
+  vSavePath = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -28,6 +34,9 @@ export class PgSetDetailsPage implements OnInit {
     private TbCard: TbCardsService,
     private loadingCtr: LoadingController,
     private globalServ: GlobalsService,
+    private http: Http,
+    private utils: UtilsService,
+    private zip: Zip,
   ) {
     this.route.queryParams.subscribe(params => {
       if (this.router.getCurrentNavigation().extras.state) {
@@ -38,10 +47,12 @@ export class PgSetDetailsPage implements OnInit {
         });
       }
     });
+
+    this.vIsApp    = this.globalServ.getIsApp();
+    this.vSavePath = this.globalServ.getSavePath();
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ionViewDidEnter(){
     this.loadingCtr.create({
@@ -66,6 +77,40 @@ export class PgSetDetailsPage implements OnInit {
     });
   }
 
+  private checkImageExists(vCimUrlApp){
+    return new Promise(
+    (resolve, reject) => {
+      let assetsPath;
+
+      if(this.globalServ.getIsApp()){
+        assetsPath = this.vSavePath + 'card_images/';
+        this.file.checkFile(assetsPath, vCimUrlApp).then((result) => {
+          if(result){
+            resolve(true);
+          } else {
+            reject(false);
+          }
+        })
+        .catch((err) => {
+          reject(false);
+        });
+      } else {
+        //@todo in WEB cehck if this.vSavePath WORKS!
+        assetsPath = this.file.applicationDirectory + 'assets/card_images/';
+        fetch(assetsPath + vCimUrlApp).then(res => {
+          if(res.ok){
+            resolve(true);
+          } else {
+            reject(false);
+          }
+        })
+        .catch((err) => {
+          reject(false);
+        });
+      }
+    });
+  }
+
   loadCardsBySet(vSetId){
     return new Promise(
     (resolve, reject) => {
@@ -73,15 +118,35 @@ export class PgSetDetailsPage implements OnInit {
 
       this.TbSet.getSetCards(vSetId).then((arrSetCards:any) => {
         for(var i=0; i<arrSetCards.length; i++){
-          let cardId = arrSetCards[i];
-          this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
-            var infoCard = {
-              id   : cardId,
-              name : arrCards[cardId].car_name,
-              html : htmlCard,
-            };
-            this.vSetCards.push(infoCard);
+          let cardId   = arrSetCards[i];
+          let Card     = arrCards[cardId];
+          let infoCard = {
+            id   : cardId,
+            name : Card.car_name,
+            html : '',
+            path : '',
+          };
+
+          this.checkImageExists(Card.cim_url_app).then((result) => {
+            this.file.readAsDataURL(this.vSavePath + 'card_images/', Card.cim_url_app).then(dataurl => {
+              console.log(dataurl);
+              infoCard.path = dataurl;
+              this.vSetCards.push(infoCard);
+            })
+            .catch((err) => {
+              console.log(1, err);
+            });
+          })
+          .catch((err) => {
+            this.TbCard.getHtmlCardId(cardId).then((htmlCard:any) => {
+              infoCard.html = htmlCard;
+              this.vSetCards.push(infoCard);
+            });
           });
+
+          if(i > 20){
+            break;
+          }
         }
         resolve(true);
       })
@@ -107,49 +172,73 @@ export class PgSetDetailsPage implements OnInit {
     return await modal.present();
   }
 
-  /*
-  this part of the app works only once on IOS
-  its a better way to show images but need some work
+  execDwldSetImg(vSetCode, vSetId){
+    this.loadingCtr.create({
+      message: 'Loading, please wait',
+      spinner: 'dots',
+    }).then((res) => {
+      res.present();
 
-  import { PhotoViewer } from '@ionic-native/photo-viewer/ngx';
-  */
-  /*showImage(url, cardName){
-    // url = www/assets/card_images/0000579f-7b35-4ed3-b44c-db2a538066fe-1.jpg
-    // var idxSlash    = url.lastIndexOf('/')+1;
-    // var imgName     = url.substr(idxSlash);
-    var imgName     = url.split('\\').pop().split('/').pop();
-    var imgPath     = url.replace(imgName, '');
-    var tempImgName = 'imgTempSet.jpg';
-
-    //const ROOT_DIRECTORY     = this.file.dataDirectory; // works on IOS
-    const ROOT_DIRECTORY     = this.file.externalRootDirectory;
-    const downloadFolderName = 'tempDownloadFolder';
-
-    //Create a folder in memory location
-    this.file.createDir(ROOT_DIRECTORY, downloadFolderName, true)
-    .then((entries) => {
-      //Copy our asset/img/logo.jpg to folder we created
-      this.file.copyFile(this.file.applicationDirectory + imgPath, imgName, ROOT_DIRECTORY + downloadFolderName + '//', tempImgName)
-        .then((entries) => {
-          var options = {
-            share: true, // default is false
-            closeButton: false, // default is true
-            copyToReference: true, // default is false
-            headers: '',  // If this is not provided, an exception will be triggered
-            piccasoOptions: { } // If this is not provided, an exception will be triggered
-          };
-
-          this.photoViewer.show(ROOT_DIRECTORY + downloadFolderName + "/" + tempImgName, cardName, options);
-          this.file.removeFile(ROOT_DIRECTORY + downloadFolderName + "/", tempImgName).then( data => {
-            console.log('removeu');
-          });
-        })
-        .catch((error) => {
-          alert('1 error ' + JSON.stringify(error));
+      this.downloadSetImages(vSetCode).then((response) => {
+        this.vSetCards = [];
+        this.loadCardsBySet(vSetId).then((response) => {
+          res.dismiss();
         });
-    })
-    .catch((error) => {
-      alert('2 error' + JSON.stringify(error));
+      })
+      .catch((err) => {
+        res.dismiss();
+      });
     });
-  }*/
+  }
+
+  private downloadSetImages(vSetCode){
+    return new Promise(
+    (resolve, reject) => {
+      let url      = this.utils.getWsPath() + '/Cards/downloadSetCardImages'
+      let postData = {
+        'appkey'  : this.utils.getAppKey(),
+        'setCode' : vSetCode,
+      };
+
+      this.http.post(url, JSON.stringify(postData), {
+        method: RequestMethod.Post,
+        responseType: ResponseContentType.Blob,
+        headers: new Headers({'Content-type': 'application/json'})
+      })
+      .subscribe((response) => {
+        var blob     = new Blob([response.blob()], {type: 'application/zip'});
+        var filePath = '';
+        var fileName = vSetCode + '.zip';
+
+        if(this.globalServ.getIsApp()){
+          filePath = this.vSavePath + '/card_images/';
+          this.file.writeFile(filePath, fileName, blob, {replace: true}).then((response) => {
+            // console.log(1, response);
+
+            this.zip.unzip(filePath + fileName, filePath, (progress) => {
+              // console.log('Unzipping, ' + Math.round((progress.loaded / progress.total) * 100) + '%');
+            })
+            .then((result) => {
+              if(result === 0){
+                //console.log('SUCCESS');
+                resolve(true);
+              }
+              if(result === -1){
+                //console.log('FAILED');
+                reject(false);
+              }
+            });
+          })
+          .catch((err) => {
+            //console.log(2, err);
+            reject(false);
+          });
+        } else {
+          filePath = fileName;
+          saveAs(blob, filePath);
+          resolve(true);
+        }
+      });
+    });
+  }
 }

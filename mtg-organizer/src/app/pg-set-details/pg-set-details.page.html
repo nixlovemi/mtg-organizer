@@ -4,6 +4,9 @@
       <ion-back-button class="menu-toolbar-default" defaultHref="set-list"></ion-back-button>
     </ion-buttons>
     <ion-title class="title">{{vSetName}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-icon (click)="execDwldSetImg(Set.set_code, Set.set_id)" class="menu-toolbar-default download-img" name="cloud-download"></ion-icon>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -30,8 +33,8 @@ flip
 <ion-content>
   <ion-row>
     <ion-col size="6" align-self-center text-center *ngFor="let c of vSetCards">
-      <!--<img (click)="showImage(c.img_path, c.name)" src="{{c.img_path}}" />-->
-      <div [innerHTML]="c.html" (click)="showImage(c.id, c.name)"></div>
+      <img class="magic-card" *ngIf="c.html == ''" (click)="showImage(c.path, c.name)" src="{{c.path}}" />
+      <div *ngIf="c.html != ''" [innerHTML]="c.html" (click)="showImage(c.id, c.name)"></div>
     </ion-col>
   </ion-row>
 </ion-content>

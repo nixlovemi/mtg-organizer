@@ -28,6 +28,8 @@ export class PgHomePage implements OnInit {
   }
 
   ionViewDidEnter(){
+    this.vDecks = [];
+
     var deck1 = {
       "id":1,
       "format":"standard",

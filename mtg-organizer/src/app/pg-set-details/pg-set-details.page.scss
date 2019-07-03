@@ -6,9 +6,18 @@
   overflow: hidden;
 }
 ion-row{
-  background-color: #FFF;
+  /*background-color: #FFF;*/
 }
 ion-col{
   display: flex;
   justify-content: center;
+}
+.magic-card{
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.download-img{
+  font-size: 32px;
+  margin-right: 5px;
 }

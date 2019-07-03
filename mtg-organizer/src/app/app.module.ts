@@ -12,6 +12,7 @@ import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
 import { File } from '@ionic-native/file/ngx';
 import { ImageViewerComponent } from './component/image-viewer/image-viewer.component';
+import { Zip } from '@ionic-native/zip/ngx';
 
 @NgModule({
   declarations: [AppComponent, ImageViewerComponent],
@@ -28,6 +29,7 @@ import { ImageViewerComponent } from './component/image-viewer/image-viewer.comp
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     File,
+    Zip,
   ],
   bootstrap: [AppComponent]
 })
