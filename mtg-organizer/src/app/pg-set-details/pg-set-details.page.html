@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button class="menu-toolbar-default" defaultHref="set-list"></ion-back-button>
     </ion-buttons>
-    <ion-title class="title">{{vSetName}}</ion-title>
+    <ion-title class="title">{{Set.set_name}}</ion-title>
     <ion-buttons slot="end">
       <ion-icon (click)="execDwldSetImg(Set.set_code, Set.set_id)" class="menu-toolbar-default download-img" name="cloud-download"></ion-icon>
     </ion-buttons>
@@ -37,4 +37,16 @@ flip
       <div *ngIf="c.html != ''" [innerHTML]="c.html" (click)="showImage(c.id, c.name)"></div>
     </ion-col>
   </ion-row>
+
+  <div text-center *ngIf="!vDisableInfinite">
+    <ion-button fill="outline" class="collection-open-button" (click)="loadData()">Load More</ion-button>
+  </div>
+  <!--
+  <ion-infinite-scroll (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading ...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  -->
 </ion-content>

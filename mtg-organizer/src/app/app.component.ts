@@ -52,13 +52,10 @@ export class AppComponent {
     private globalServ: GlobalsService,
     private file: File,
   ) {
-    console.log('a');
     this.initializeApp();
-    console.log('b');
   }
 
   initializeApp() {
-    console.log('c');
     this.platform.ready().then(() => {
       this.isApp = (!document.URL.startsWith('http') || document.URL.startsWith('http://localhost:8080'));
       this.globalServ.setIsApp(this.isApp);
@@ -85,13 +82,9 @@ export class AppComponent {
     var dirName = 'card_images';
 
     this.file.checkDir(this.file.dataDirectory, dirName).then(response => {
-			// console.log('Directory exists'+response);
 		}).catch(err => {
-			// console.log('Directory doesn\'t exist'+JSON.stringify(err));
 			this.file.createDir(this.file.dataDirectory, dirName, false).then(response => {
-				// console.log('Directory create'+response);
 			}).catch(err => {
-				// console.log('Directory no create'+JSON.stringify(err));
 			});
 		});
   }
@@ -100,13 +93,9 @@ export class AppComponent {
     var dirName = 'data';
 
     this.file.checkDir(this.file.dataDirectory, dirName).then(response => {
-      // console.log('Directory exists'+response);
     }).catch(err => {
-      // console.log('Directory doesn\'t exist'+JSON.stringify(err));
       this.file.createDir(this.file.dataDirectory, dirName, false).then(response => {
-        // console.log('Directory create'+response);
       }).catch(err => {
-        // console.log('Directory no create'+JSON.stringify(err));
       });
     });
   }

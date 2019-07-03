@@ -19,11 +19,17 @@ import { Zip } from '@ionic-native/zip/ngx';
 })
 export class PgSetDetailsPage implements OnInit {
 
-  Set: any;
-  vSetName  = '';
-  vSetCards = [];
+  Set: any  = {
+    set_name: "",
+  };
   vIsApp    = false;
   vSavePath = '';
+
+  vSetCards        = [];
+  vSetCardsParts   = [];
+  vLimit           = 60;
+  vIdxCardsParts   = 0;
+  vDisableInfinite = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,8 +48,13 @@ export class PgSetDetailsPage implements OnInit {
       if (this.router.getCurrentNavigation().extras.state) {
         var vSetId = this.router.getCurrentNavigation().extras.state.setId;
         this.TbSet.getSet(vSetId).then((retSet:any) => {
-          this.Set      = retSet;
-          this.vSetName = this.Set.set_name;
+          this.Set = retSet;
+
+          this.TbSet.getSetCards(this.Set.set_id).then((arrSetCards:any) => {
+            while(arrSetCards.length) {
+              this.vSetCardsParts.push(arrSetCards.splice(0,this.vLimit));
+            }
+          });
         });
       }
     });
@@ -61,12 +72,8 @@ export class PgSetDetailsPage implements OnInit {
     }).then((res) => {
       res.present();
 
-      var vSetId = '-1';
-      if(typeof this.Set != 'undefined'){
-        vSetId = this.Set.set_id;
-      }
-
-      this.loadCardsBySet(vSetId).then((ret) => {
+      this.loadCardsBySet().then((ret) => {
+        this.vDisableInfinite = false;
         res.dismiss();
       })
       .catch((ret) => {
@@ -111,11 +118,45 @@ export class PgSetDetailsPage implements OnInit {
     });
   }
 
-  loadCardsBySet(vSetId){
+  loadCardsBySet(){
     return new Promise(
     (resolve, reject) => {
       let arrCards = this.globalServ.getArrCards();
+      var arrLoop  = this.vSetCardsParts[this.vIdxCardsParts];
 
+      if(typeof arrLoop != 'undefined'){
+        for(var i=0; i<arrLoop.length; i++){
+          let cardId   = arrLoop[i];
+          let Card     = arrCards[cardId];
+          let infoCard = {
+            id   : cardId,
+            name : Card.car_name,
+            html : '',
+            path : '',
+          };
+
+          this.checkImageExists(Card.cim_url_app).then((result) => {
+            this.file.readAsDataURL(this.vSavePath + 'card_images/', Card.cim_url_app).then(dataurl => {
+              infoCard.path = dataurl;
+              this.vSetCards.push(infoCard);
+            })
+            .catch((err) => {
+
+            });
+          })
+          .catch((err) => {
+            this.TbCard.getHtmlCardId(cardId).then((htmlCard:any) => {
+              infoCard.html = htmlCard;
+              this.vSetCards.push(infoCard);
+            });
+          });
+        }
+        resolve(true);
+      } else {
+        reject(false);
+      }
+
+      /*
       this.TbSet.getSetCards(vSetId).then((arrSetCards:any) => {
         for(var i=0; i<arrSetCards.length; i++){
           let cardId   = arrSetCards[i];
@@ -129,12 +170,11 @@ export class PgSetDetailsPage implements OnInit {
 
           this.checkImageExists(Card.cim_url_app).then((result) => {
             this.file.readAsDataURL(this.vSavePath + 'card_images/', Card.cim_url_app).then(dataurl => {
-              console.log(dataurl);
               infoCard.path = dataurl;
               this.vSetCards.push(infoCard);
             })
             .catch((err) => {
-              console.log(1, err);
+
             });
           })
           .catch((err) => {
@@ -153,6 +193,33 @@ export class PgSetDetailsPage implements OnInit {
       .catch((err) => {
         reject(false);
       });
+      */
+    });
+  }
+
+  loadData(){
+    this.loadingCtr.create({
+      message: 'Loading, please wait',
+      spinner: 'dots',
+    }).then((res) => {
+      res.present();
+
+      this.vIdxCardsParts = this.vIdxCardsParts + 1;
+
+      setTimeout(() => {
+        this.loadCardsBySet().then((response) => {
+          res.dismiss();
+
+          var testIfFinishCardsParts = this.vSetCardsParts[this.vIdxCardsParts + 1];
+          if(typeof testIfFinishCardsParts == "undefined"){
+            this.vDisableInfinite = true;
+          }
+        })
+        .catch((response) => {
+          this.vDisableInfinite = true;
+          res.dismiss();
+        });
+      }, 500);
     });
   }
 
@@ -180,8 +247,11 @@ export class PgSetDetailsPage implements OnInit {
       res.present();
 
       this.downloadSetImages(vSetCode).then((response) => {
-        this.vSetCards = [];
-        this.loadCardsBySet(vSetId).then((response) => {
+        this.vSetCards        = [];
+        this.vDisableInfinite = false;
+        this.vIdxCardsParts   = 0;
+
+        this.loadCardsBySet().then((response) => {
           res.dismiss();
         });
       })
@@ -213,24 +283,20 @@ export class PgSetDetailsPage implements OnInit {
         if(this.globalServ.getIsApp()){
           filePath = this.vSavePath + '/card_images/';
           this.file.writeFile(filePath, fileName, blob, {replace: true}).then((response) => {
-            // console.log(1, response);
 
             this.zip.unzip(filePath + fileName, filePath, (progress) => {
               // console.log('Unzipping, ' + Math.round((progress.loaded / progress.total) * 100) + '%');
             })
             .then((result) => {
               if(result === 0){
-                //console.log('SUCCESS');
                 resolve(true);
               }
               if(result === -1){
-                //console.log('FAILED');
                 reject(false);
               }
             });
           })
           .catch((err) => {
-            //console.log(2, err);
             reject(false);
           });
         } else {
