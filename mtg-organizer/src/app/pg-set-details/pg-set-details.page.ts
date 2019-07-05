@@ -55,14 +55,21 @@ export class PgSetDetailsPage implements OnInit {
 
           this.TbSet.getSetCards(this.Set.set_id).then((arrSetCards:any) => {
             var vIdxCardsPartsMx = null;
-            while(arrSetCards.length) {
-              this.vSetCardsParts.push(arrSetCards.splice(0,this.vLimit));
-              if(vIdxCardsPartsMx == null){
-                vIdxCardsPartsMx = 0;
-              } else {
-                vIdxCardsPartsMx++;
+
+            if(arrSetCards.length <= this.vLimit){
+              this.vSetCardsParts.push(arrSetCards);
+              vIdxCardsPartsMx = 0;
+            } else {
+              while(arrSetCards.length) {
+                this.vSetCardsParts.push(arrSetCards.splice(0,this.vLimit));
+                if(vIdxCardsPartsMx == null){
+                  vIdxCardsPartsMx = 0;
+                } else {
+                  vIdxCardsPartsMx++;
+                }
               }
             }
+
             this.vIdxCardsPartsMx = vIdxCardsPartsMx;
           });
         });
@@ -146,16 +153,24 @@ export class PgSetDetailsPage implements OnInit {
               path : '',
             };
 
-            this.file.readAsDataURL(this.vSavePath + 'card_images/', Card.cim_url_app).then(dataurl => {
-              infoCard.path = dataurl;
-              this.vSetCards.push(infoCard);
-            })
-            .catch((err) => {
+            if(this.globalServ.getIsApp()){
+              this.file.readAsDataURL(this.vSavePath + 'card_images/', Card.cim_url_app).then(dataurl => {
+                infoCard.path = dataurl;
+                this.vSetCards.push(infoCard);
+              })
+              .catch((err) => {
+                this.TbCard.getHtmlCardId(cardId).then((htmlCard:any) => {
+                  infoCard.html = htmlCard;
+                  this.vSetCards.push(infoCard);
+                });
+              });
+            } else {
+              console.log(Card);
               this.TbCard.getHtmlCardId(cardId).then((htmlCard:any) => {
                 infoCard.html = htmlCard;
                 this.vSetCards.push(infoCard);
               });
-            });
+            }
           }
           resolve(true);
         });
