@@ -33,7 +33,6 @@ export class TbSetService {
         for(var i=0; i<arrSetKeys.length; i++){
           var setKey = arrSetKeys[i];
           var Set    = jsonSet[setKey];
-
           if(Set.set_card_count > 0){
             var vSetName = Set.set_name;
             var vFiltered = true;

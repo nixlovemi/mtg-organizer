@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -10,20 +10,24 @@ export class UtilsService {
 
   constructor(
     public alertCtr: AlertController,
+    private loadingCtr: LoadingController,
   ) {
     this.webServicePath = 'http://crochepassoapasso.com.br/magic-app/';
     this.appkey         = '960b8735446c07f53e9b90d4202a4e0d';
   }
 
-  getWsPath() {
+  getWsPath()
+  {
     return this.webServicePath;
   }
 
-  getAppKey() {
+  getAppKey()
+  {
     return this.appkey;
   }
 
-  async showAlert(header, subHeader, message, buttons) {
+  async showAlert(header, subHeader, message, buttons)
+  {
     const alert = await this.alertCtr.create({
       header: header,
       subHeader: subHeader,
@@ -34,7 +38,35 @@ export class UtilsService {
     return await alert.present();
   }
 
-  getDateString() {
+  async getLoader(message, spinner, autoclose=true)
+  {
+    return await this.loadingCtr.create({
+      message: message,
+      spinner: spinner,
+    }).then((res) => {
+      res.present();
+
+      if(autoclose){
+        let TIME_IN_MS = 3000;
+        let hideFooterTimeout = setTimeout( () => {
+          this.closeLoader();
+        }, TIME_IN_MS);
+      }
+    });
+  }
+
+  async closeLoader()
+  {
+    try {
+      return await this.loadingCtr.dismiss();
+    }
+    catch(err) {
+      return;
+    }
+  }
+
+  getDateString()
+  {
     var arrInfo =
     {
       monthNames: 'Janeiro, Fevereiro, Março, Abril, Maio, Junho, Julho, Agosto, Setembro, Outubro, Novembro, Dezembro',
@@ -50,7 +82,8 @@ export class UtilsService {
    * date: tem que ser no formato ISO String (new Date().toISOString())
    * 2019-05-24T19:29:44.645
   */
-  formatDate(date, format = 'YYYY-MM-DD') {
+  formatDate(date, format = 'YYYY-MM-DD')
+  {
     let strDate = '' + date.replace('Z', '');
     let ano = strDate.substr(0, 4);
     let mes = strDate.substr(5, 2);
@@ -68,7 +101,8 @@ export class UtilsService {
   * decimais: quantidade de casas decimais, por padrão será 2
   * simbolo: tipo de moeda, por padrão é vazia
   */
-  formatMoney(valor, decimais = 2, simbolo = '') {
+  formatMoney(valor, decimais = 2, simbolo = '')
+  {
     if (isNaN(valor)) return '';
     else {
       let vValor = parseFloat(valor);
@@ -81,7 +115,8 @@ export class UtilsService {
   /*
   * Pega a data atual do dispositivo
   */
-  getDateAtual() {
+  getDateAtual()
+  {
     let d = new Date(),
       month = '' + (d.getMonth() + 1),
       day = '' + d.getDate(),
@@ -96,7 +131,8 @@ export class UtilsService {
   /*
   * Converte uma data do formato retornado pelo JS
   */
-  converteData(str) {
+  converteData(str)
+  {
     var date = new Date(str),
       mnth = ("0" + (date.getMonth() + 1)).slice(-2),
       day = ("0" + date.getDate()).slice(-2);

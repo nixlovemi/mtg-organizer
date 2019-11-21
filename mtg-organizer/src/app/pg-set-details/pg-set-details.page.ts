@@ -82,23 +82,13 @@ export class PgSetDetailsPage implements OnInit {
 
   ngOnInit() {}
 
-  ionViewDidEnter(){
-    this.loadingCtr.create({
-      message: 'Loading, please wait',
-      spinner: 'dots',
-    }).then((res) => {
-      res.present();
+  async ionViewDidEnter(){
+    await this.utils.getLoader('Loading, please wait', 'dots');
 
-      this.loadCardsBySet().then((ret) => {
-        this.checkDisableInfinite();
-        res.dismiss();
-      })
-      .catch((ret) => {
-        res.dismiss();
-      });
+    await this.loadCardsBySet();
+    this.checkDisableInfinite();
 
-      res.onDidDismiss().then((dis) => { });
-    });
+    await this.utils.closeLoader();
   }
 
   private checkImageExists(vCimUrlApp){
@@ -135,47 +125,51 @@ export class PgSetDetailsPage implements OnInit {
     });
   }
 
-  loadCardsBySet(){
+  async loadCardsBySet(){
+    let arrCards = this.globalServ.getArrCards();
+    var arrLoop  = this.vSetCardsParts[this.vIdxCardsParts];
+
+    if(typeof arrLoop != 'undefined'){
+      //this.zone.run(() => {
+        for(var i=0; i<arrLoop.length; i++){
+          let cardId   = arrLoop[i];
+          let Card     = arrCards[cardId];
+          let infoCard = {
+            id   : cardId,
+            name : Card.car_name,
+            html : '',
+            path : '',
+          };
+
+          await this.getHtmlOrImage(Card.cim_url_app, cardId, infoCard);
+        }
+      //});
+    }
+  }
+
+  getHtmlOrImage(cim_url_app, cardId, infoCard)
+  {
     return new Promise(
     (resolve, reject) => {
-      let arrCards = this.globalServ.getArrCards();
-      var arrLoop  = this.vSetCardsParts[this.vIdxCardsParts];
-
-      if(typeof arrLoop != 'undefined'){
-        this.zone.run(() => {
-          for(var i=0; i<arrLoop.length; i++){
-            let cardId   = arrLoop[i];
-            let Card     = arrCards[cardId];
-            let infoCard = {
-              id   : cardId,
-              name : Card.car_name,
-              html : '',
-              path : '',
-            };
-
-            if(this.globalServ.getIsApp()){
-              this.file.readAsDataURL(this.vSavePath + 'card_images/', Card.cim_url_app).then(dataurl => {
-                infoCard.path = dataurl;
-                this.vSetCards.push(infoCard);
-              })
-              .catch((err) => {
-                this.TbCard.getHtmlCardId(cardId).then((htmlCard:any) => {
-                  infoCard.html = htmlCard;
-                  this.vSetCards.push(infoCard);
-                });
-              });
-            } else {
-              console.log(Card);
-              this.TbCard.getHtmlCardId(cardId).then((htmlCard:any) => {
-                infoCard.html = htmlCard;
-                this.vSetCards.push(infoCard);
-              });
-            }
-          }
+      if(this.globalServ.getIsApp()){
+        this.file.readAsDataURL(this.vSavePath + 'card_images/', cim_url_app).then((dataurl) => {
+          infoCard.path = dataurl;
+          this.vSetCards.push(infoCard);
           resolve(true);
+        })
+        .catch((err) => {
+          this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
+            infoCard.html = htmlCard;
+            this.vSetCards.push(infoCard);
+            resolve(true);
+          });
         });
       } else {
-        reject(false);
+        this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
+          infoCard.html = htmlCard;
+          this.vSetCards.push(infoCard);
+          resolve(true);
+        });
       }
     });
   }

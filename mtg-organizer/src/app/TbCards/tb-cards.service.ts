@@ -60,11 +60,19 @@ export class TbCardsService {
           vPtText = Card.card_name.car_power + '/' + Card.card_name.car_toughness;
         }
 
+        var vOracleTxt = '';
+        if(Card.car_oracle_text != null){
+          vOracleTxt = Card.car_oracle_text;
+        } else {
+          vOracleTxt = '';
+        }
+
+        // @todo melhorar HTML e fazer carta split
         var card = {
           "name"       : Card.car_name,
           "htmlCost"   : this.getImageFromCardSymbol(Card.card_name.car_mana_cost),
           "type"       : Card.card_name.car_type_line,
-          "text"       : Card.car_oracle_text.trim(),
+          "text"       : vOracleTxt,
           "pt_text"    : vPtText,
           "number"     : Card.car_collector_number,
           "total"      : '1',
