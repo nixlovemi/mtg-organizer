@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { GlobalsService } from '../globals.service';
+import { TbSetService } from '../TbSet/tb-set.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ export class TbCardsService {
   constructor(
     public storage: Storage,
     private globalServ: GlobalsService,
+    public SetSrv: TbSetService,
   ) { }
 
   getCard(cardId){
@@ -67,56 +69,58 @@ export class TbCardsService {
           vOracleTxt = '';
         }
 
-        // @todo melhorar HTML e fazer carta split
-        var card = {
-          "name"       : Card.car_name,
-          "htmlCost"   : this.getImageFromCardSymbol(Card.card_name.car_mana_cost),
-          "type"       : Card.card_name.car_type_line,
-          "text"       : vOracleTxt,
-          "pt_text"    : vPtText,
-          "number"     : Card.car_collector_number,
-          "total"      : '1',
-          "img_path"   : "../../assets/card_images/" + Card.cim_url_app,
-          "colorClass" : this.getCardColorClass(Card.card_name.car_colors),
-          "show_power" : ((Card.card_name.car_power != null && Card.card_name.car_toughness != null) || Card.card_name.car_loyalty != null),
-        };
+        this.SetSrv.getSetByTxt( Card.car_set ).then((Set:any) => {
+          // @todo melhorar HTML e fazer carta split
+          var card = {
+            "name"       : Card.car_name,
+            "htmlCost"   : this.getImageFromCardSymbol(Card.card_name.car_mana_cost),
+            "type"       : Card.card_name.car_type_line,
+            "text"       : vOracleTxt,
+            "pt_text"    : vPtText,
+            "number"     : Card.car_collector_number,
+            "total"      : Set.set_card_count,
+            "img_path"   : "../../assets/card_images/" + Card.cim_url_app,
+            "colorClass" : this.getCardColorClass(Card.card_name.car_colors),
+            "show_power" : ((Card.card_name.car_power != null && Card.card_name.car_toughness != null) || Card.card_name.car_loyalty != null),
+          };
 
-        if(size == 'large'){
-          var cssCard = 'card-large';
-          var cssDesc = 'card-desc-large';
-        } else {
-          var cssCard = '';
-          var cssDesc = '';
-        }
+          if(size == 'large'){
+            var cssCard = 'card-large';
+            var cssDesc = 'card-desc-large';
+          } else {
+            var cssCard = '';
+            var cssDesc = '';
+          }
 
-        var htmlCard =        '<div class="card '+cssCard+'">';
-        htmlCard = htmlCard + '  <div class="inner '+card.colorClass+'">';
-        htmlCard = htmlCard + '    <div class="title">';
-        htmlCard = htmlCard + '      <div class="cost">'+card.htmlCost+'</div>';
-        htmlCard = htmlCard + '      '+card.name+'';
-        htmlCard = htmlCard + '    </div>';
-        htmlCard = htmlCard + '    <div class="image">&nbsp;</div>';
-        htmlCard = htmlCard + '    <div class="type">';
-        htmlCard = htmlCard + '      '+card.type+'';
-        htmlCard = htmlCard + '      <div class="symbol">';
-        htmlCard = htmlCard + '        <i class="ss ss-emn ss-uncommon ss-fw"></i>';
-        htmlCard = htmlCard + '      </div>';
-        htmlCard = htmlCard + '    </div>';
-        htmlCard = htmlCard + '    <div class="desc '+cssDesc+'">';
-        htmlCard = htmlCard + '      '+card.text+'';
-        htmlCard = htmlCard + '    </div>';
-        if(card.show_power == true){
-          htmlCard = htmlCard + '  <div class="power">';
-          htmlCard = htmlCard + '    <span>'+card.pt_text+'</span>';
+          var htmlCard =        '<div class="card '+cssCard+'">';
+          htmlCard = htmlCard + '  <div class="inner '+card.colorClass+'">';
+          htmlCard = htmlCard + '    <div class="title">';
+          htmlCard = htmlCard + '      <div class="cost">'+card.htmlCost+'</div>';
+          htmlCard = htmlCard + '      '+card.name+'';
+          htmlCard = htmlCard + '    </div>';
+          htmlCard = htmlCard + '    <div class="image">&nbsp;</div>';
+          htmlCard = htmlCard + '    <div class="type">';
+          htmlCard = htmlCard + '      '+card.type+'';
+          htmlCard = htmlCard + '      <div class="symbol">';
+          htmlCard = htmlCard + '        <i class="ss ss-emn ss-uncommon ss-fw"></i>';
+          htmlCard = htmlCard + '      </div>';
+          htmlCard = htmlCard + '    </div>';
+          htmlCard = htmlCard + '    <div class="desc '+cssDesc+'">';
+          htmlCard = htmlCard + '      '+card.text+'';
+          htmlCard = htmlCard + '    </div>';
+          if(card.show_power == true){
+            htmlCard = htmlCard + '  <div class="power">';
+            htmlCard = htmlCard + '    <span>'+card.pt_text+'</span>';
+            htmlCard = htmlCard + '  </div>';
+          }
+          htmlCard = htmlCard + '    <div class="footer">';
+          htmlCard = htmlCard + '      '+card.number+'/'+card.total+'';
+          htmlCard = htmlCard + '    </div>';
           htmlCard = htmlCard + '  </div>';
-        }
-        htmlCard = htmlCard + '    <div class="footer">';
-        htmlCard = htmlCard + '      '+card.number+'/'+card.total+'';
-        htmlCard = htmlCard + '    </div>';
-        htmlCard = htmlCard + '  </div>';
-        htmlCard = htmlCard + '</div>';
+          htmlCard = htmlCard + '</div>';
 
-        resolve(htmlCard);
+          resolve(htmlCard);
+        });
       })
       .catch((err) => {
         reject('');

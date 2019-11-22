@@ -7,11 +7,39 @@ import * as moment from 'moment';
   providedIn: 'root'
 })
 export class TbSetService {
+  arrSets = [];
 
   constructor(
     public storage: Storage,
     public http: Http,
-  ) { }
+  ) {
+    this.loadSetsIntoArray();
+  }
+
+  loadSetsIntoArray()
+  {
+    fetch('../../assets/data/sets.json')
+    .then(res => res.json())
+    .then(jsonSet => {
+      var arrSetKeys = Object.keys(jsonSet);
+      for(var i=0; i<arrSetKeys.length; i++){
+        var setKey = arrSetKeys[i];
+        var Set    = jsonSet[setKey];
+
+        this.arrSets.push(Set);
+      }
+
+      this.orderSets();
+    });
+  }
+
+  async orderSets()
+  {
+    function date_sort(a, b) {
+      return new Date(b.set_released_at).getTime() - new Date(a.set_released_at).getTime();
+    }
+    await this.arrSets.sort(date_sort);
+  }
 
   getAllSets(limit=5, filter=''){
     return new Promise(
@@ -22,49 +50,37 @@ export class TbSetService {
       };
       let arraySets = [];
 
-      fetch('../../assets/data/sets.json').then(res => res.json())
-      .then(jsonSet => {
-        /*function date_sort(a, b) {
-          return new Date(b.set_released_at).getTime() - new Date(a.set_released_at).getTime();
-        }
-        arrSet.sort(date_sort);*/
+      for(let idx in this.arrSets){
+        var Set = this.arrSets[idx];
 
-        var arrSetKeys = Object.keys(jsonSet);
-        for(var i=0; i<arrSetKeys.length; i++){
-          var setKey = arrSetKeys[i];
-          var Set    = jsonSet[setKey];
-          if(Set.set_card_count > 0){
-            var vSetName = Set.set_name;
-            var vFiltered = true;
+        if(Set.set_card_count > 0){
+          var vSetName = Set.set_name;
+          var vFiltered = true;
 
-            if(filter != ''){
-              vFiltered = vSetName.indexOf(filter) !== -1;
-            }
+          if(filter != ''){
+            vFiltered = vSetName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+          }
 
-            if(vFiltered){
-              var set = {
-                "id"         : Set.set_id,
-                "name"       : vSetName,
-                "code"       : Set.set_code,
-                "card_count" : Set.set_card_count,
-                "release_dt" : Set.set_released_at,
-                "url_icon"   : "./assets/set_images/" + Set.set_id + "-" + Set.set_code + ".svg"
-              };
-              arraySets.push(set);
-              if(i == (limit - 1)){
-                break;
-              }
+          if(vFiltered){
+            var set = {
+              "id"         : Set.set_id,
+              "name"       : vSetName,
+              "code"       : Set.set_code,
+              "card_count" : Set.set_card_count,
+              "release_dt" : Set.set_released_at,
+              "url_icon"   : "./assets/set_images/" + Set.set_id + "-" + Set.set_code + ".svg"
+            };
+            arraySets.push(set);
+            if(arraySets.length == (limit)){
+              break;
             }
           }
         }
+      }
 
-        arrayRet.arraySets = arraySets;
-        arrayRet.count     = arrSetKeys.length;
-        resolve(arrayRet);
-      })
-      .catch((arrSet) => {
-        resolve(arrayRet);
-      });
+      arrayRet.arraySets = arraySets;
+      arrayRet.count     = this.arrSets.length;
+      resolve(arrayRet);
     });
   }
 
@@ -78,6 +94,30 @@ export class TbSetService {
           reject("Set ID does not exists!");
         } else {
           resolve(Set);
+        }
+      })
+      .catch((err) => {
+        reject('Error fetching Set! Message:' + err);
+      });
+    });
+  }
+
+  /* ex: gn2 */
+  /* car_set field */
+  getSetByTxt(setCode)
+  {
+    return new Promise(
+    (resolve, reject) => {
+      fetch('../../assets/data/sets.json').then(res => res.json())
+      .then(jsonSet => {
+        for(let idx in jsonSet){
+          var vSet = jsonSet[idx];
+          if(vSet.set_code == setCode){
+            var setId = vSet.set_id;
+            this.getSet(setId).then(retSet => {
+              resolve(retSet);
+            });
+          }
         }
       })
       .catch((err) => {

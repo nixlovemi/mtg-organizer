@@ -5,9 +5,10 @@ import { File } from '@ionic-native/file/ngx';
   providedIn: 'root'
 })
 export class GlobalsService {
-  arrCards     = [];
-  arrCardsName = [];
-  isApp        = false;
+  arrCards        = [];
+  arrCardsName    = [];
+  arrGlobSetCards = [];
+  isApp           = false;
 
   constructor(
     private file: File,
@@ -39,5 +40,13 @@ export class GlobalsService {
 
   getSavePath(){
     return this.file.dataDirectory;
+  }
+
+  setGlobSetCards(vGlobSetCards){
+    this.arrGlobSetCards = vGlobSetCards;
+  }
+
+  getGlobSetCards(){
+    return this.arrGlobSetCards;
   }
 }

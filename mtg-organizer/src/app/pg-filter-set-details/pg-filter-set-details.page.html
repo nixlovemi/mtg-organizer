@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="title">Choose Filters</ion-title>
+    <ion-buttons slot="end">
+      <ion-icon (click)="closeModal()" class="menu-toolbar-default download-img" name="close"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <fieldset>
+    <legend>Filters</legend>
+
+    <ion-grid>
+      <ion-row align-items-start>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="stacked">Card Number</ion-label>
+            <ion-input [(ngModel)]="vFilters.card_number" maxlength="3" (keypress)="numberOnlyValidation($event)" type="tel" value=""></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Card Name</ion-label>
+            <ion-input [(ngModel)]="vFilters.card_name" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Type (or)</ion-label>
+            <ion-select [(ngModel)]="vFilters.type" multiple="true" cancelText="Close" okText="Select">
+              <ion-select-option value="Artifact">Artifact</ion-select-option>
+              <ion-select-option value="Conspiracy">Conspiracy</ion-select-option>
+              <ion-select-option value="Creature">Creature</ion-select-option>
+              <ion-select-option value="Emblem">Emblem</ion-select-option>
+              <ion-select-option value="Enchantment">Enchantment</ion-select-option>
+              <ion-select-option value="Hero">Hero</ion-select-option>
+              <ion-select-option value="Instant">Instant</ion-select-option>
+              <ion-select-option value="Land">Land</ion-select-option>
+              <ion-select-option value="Phenomenon">Phenomenon</ion-select-option>
+              <ion-select-option value="Plane">Plane</ion-select-option>
+              <ion-select-option value="Planeswalker">Planeswalker</ion-select-option>
+              <ion-select-option value="Scheme">Scheme</ion-select-option>
+              <ion-select-option value="Sorcery">Sorcery</ion-select-option>
+              <ion-select-option value="Tribal">Tribal</ion-select-option>
+              <ion-select-option value="Vanguard">Vanguard</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Rarity</ion-label>
+            <ion-select [(ngModel)]="vFilters.rarity" multiple="true" cancelText="Close" okText="Select">
+              <ion-select-option value="common">Common</ion-select-option>
+              <ion-select-option value="uncommon">Uncommon</ion-select-option>
+              <ion-select-option value="rare">Rare</ion-select-option>
+              <ion-select-option value="mythic">Mythic</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Colors (or)</ion-label>
+            <ion-select [(ngModel)]="vFilters.colors" multiple="true" cancelText="Close" okText="Select">
+              <ion-select-option value="W">White</ion-select-option>
+              <ion-select-option value="U">Blue</ion-select-option>
+              <ion-select-option value="B">Black</ion-select-option>
+              <ion-select-option value="R">Red</ion-select-option>
+              <ion-select-option value="G">Green</ion-select-option>
+              <ion-select-option value="colorless">Colorless</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row style="padding-top: 30px;" align-items-start>
+        <ion-col size="6" class="ion-text-center">
+          <ion-button (click)="applyFilters()" fill="outline" class="collection-open-button">Apply Filters</ion-button>
+        </ion-col>
+        <ion-col size="6" class="ion-text-center">
+          <ion-button (click)="clearFilters()" fill="outline" class="collection-open-button">Clear Filters</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </fieldset>
+</ion-content>

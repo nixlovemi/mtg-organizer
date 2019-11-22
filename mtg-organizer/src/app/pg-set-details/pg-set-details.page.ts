@@ -4,6 +4,7 @@ import { TbSetService } from '../TbSet/tb-set.service';
 import { File } from '@ionic-native/file/ngx';
 import { ModalController } from '@ionic/angular';
 import { ImageViewerComponent } from '../component/image-viewer/image-viewer.component';
+import { PgFilterSetDetailsPage } from '../pg-filter-set-details/pg-filter-set-details.page';
 import { TbCardsService } from '../TbCards/tb-cards.service';
 import { LoadingController } from '@ionic/angular';
 import { GlobalsService } from '../globals.service';
@@ -19,12 +20,12 @@ import * as moment from 'moment';
   styleUrls: ['./pg-set-details.page.scss'],
 })
 export class PgSetDetailsPage implements OnInit {
-
   Set: any  = {
     set_name: "",
   };
-  vIsApp    = false;
-  vSavePath = '';
+  vIsApp           = false;
+  vSavePath        = '';
+  vCurrentFilters  = null;
 
   vSetCards        = [];
   vSetCardsParts   = [];
@@ -50,43 +51,48 @@ export class PgSetDetailsPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (this.router.getCurrentNavigation().extras.state) {
         var vSetId = this.router.getCurrentNavigation().extras.state.setId;
-        this.TbSet.getSet(vSetId).then((retSet:any) => {
-          this.Set = retSet;
-
-          this.TbSet.getSetCards(this.Set.set_id).then((arrSetCards:any) => {
-            var vIdxCardsPartsMx = null;
-
-            if(arrSetCards.length <= this.vLimit){
-              this.vSetCardsParts.push(arrSetCards);
-              vIdxCardsPartsMx = 0;
-            } else {
-              while(arrSetCards.length) {
-                this.vSetCardsParts.push(arrSetCards.splice(0,this.vLimit));
-                if(vIdxCardsPartsMx == null){
-                  vIdxCardsPartsMx = 0;
-                } else {
-                  vIdxCardsPartsMx++;
-                }
-              }
-            }
-
-            this.vIdxCardsPartsMx = vIdxCardsPartsMx;
-          });
-        });
+        this.init(vSetId);
       }
     });
+  }
+
+  ngOnInit() {}
+
+  async init(vSetId)
+  {
+    this.Set           = await this.TbSet.getSet(vSetId);
+    var arrSetCards    = await this.TbSet.getSetCards(this.Set.set_id);
+
+    this.spliceSetCards(arrSetCards);
 
     this.vIsApp    = this.globalServ.getIsApp();
     this.vSavePath = this.globalServ.getSavePath();
   }
 
-  ngOnInit() {}
+  spliceSetCards(arrSetCards){
+    var vIdxCardsPartsMx = null;
+
+    if(arrSetCards.length <= this.vLimit){
+      this.vSetCardsParts.push(arrSetCards);
+      vIdxCardsPartsMx = 0;
+    } else {
+      while(arrSetCards.length) {
+        this.vSetCardsParts.push(arrSetCards.splice(0,this.vLimit));
+        if(vIdxCardsPartsMx == null){
+          vIdxCardsPartsMx = 0;
+        } else {
+          vIdxCardsPartsMx++;
+        }
+      }
+    }
+
+    this.vIdxCardsPartsMx = vIdxCardsPartsMx;
+  }
 
   async ionViewDidEnter(){
     await this.utils.getLoader('Loading, please wait', 'dots');
 
     await this.loadCardsBySet();
-    this.checkDisableInfinite();
 
     await this.utils.closeLoader();
   }
@@ -145,53 +151,47 @@ export class PgSetDetailsPage implements OnInit {
         }
       //});
     }
+
+    await this.checkDisableInfinite();
   }
 
   getHtmlOrImage(cim_url_app, cardId, infoCard)
   {
     return new Promise(
     (resolve, reject) => {
-      if(this.globalServ.getIsApp()){
-        this.file.readAsDataURL(this.vSavePath + 'card_images/', cim_url_app).then((dataurl) => {
-          infoCard.path = dataurl;
-          this.vSetCards.push(infoCard);
-          resolve(true);
-        })
-        .catch((err) => {
+      this.zone.run(() => {
+        if(this.globalServ.getIsApp()){
+          this.file.readAsDataURL(this.vSavePath + 'card_images/', cim_url_app).then((dataurl) => {
+            infoCard.path = dataurl;
+            this.vSetCards.push(infoCard);
+            resolve(true);
+          })
+          .catch((err) => {
+            this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
+              infoCard.html = htmlCard;
+              this.vSetCards.push(infoCard);
+              resolve(true);
+            });
+          });
+        } else {
           this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
             infoCard.html = htmlCard;
             this.vSetCards.push(infoCard);
             resolve(true);
           });
-        });
-      } else {
-        this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
-          infoCard.html = htmlCard;
-          this.vSetCards.push(infoCard);
-          resolve(true);
-        });
-      }
+        }
+      });
     });
   }
 
-  loadData(){
-    this.loadingCtr.create({
-      message: 'Loading, please wait',
-      spinner: 'dots',
-    }).then((res) => {
-      res.present();
+  async loadData(){
+    await this.utils.getLoader('Loading, please wait', 'dots');
 
-      this.vIdxCardsParts = this.vIdxCardsParts + 1;
+    this.vDisableInfinite = true;
+    this.vIdxCardsParts   = this.vIdxCardsParts + 1;
+    await this.loadCardsBySet();
 
-      this.loadCardsBySet().then((response) => {
-        this.checkDisableInfinite();
-        res.dismiss();
-      })
-      .catch((response) => {
-        this.vDisableInfinite = true;
-        res.dismiss();
-      });
-    });
+    await this.utils.closeLoader();
   }
 
   async showImage(url, cardName, description: string = '') {
@@ -234,7 +234,6 @@ export class PgSetDetailsPage implements OnInit {
               this.vIdxCardsParts   = 0;
 
               this.loadCardsBySet().then((response) => {
-                this.checkDisableInfinite();
                 res.dismiss();
               });
             })
@@ -306,5 +305,139 @@ export class PgSetDetailsPage implements OnInit {
       this.vDisableInfinite = true;
     }
     */
+  }
+
+  async presentFilter()
+  {
+    const modal = await this.modalController.create({
+      component: PgFilterSetDetailsPage,
+      componentProps: {
+        'vCurrentFilters' : this.vCurrentFilters,
+      }
+    });
+    await modal.present();
+
+    const { data }       = await modal.onWillDismiss();
+    this.vCurrentFilters = data.filters;
+    if(data.apply){
+      this.applyFilters(data.filters);
+    }
+  }
+
+  async applyFilters(filters)
+  {
+    var originalSetCards  = await this.TbSet.getSetCards(this.Set.set_id);
+    let arrCards          = await this.globalServ.getArrCards();
+    let arrCardsName      = await this.globalServ.getArrCardsName();
+    let filteredCards     = [];
+
+    //console.log(arrCards3[0]);
+    //console.log(arrCards3[49605], arrCards3[49606], arrCards3[49607], arrCards3[49608], arrCards3[49609]);
+    //console.log(arrCards2[49605], arrCards2[49606], arrCards2[49607], arrCards2[49608], arrCards2[49609]);
+
+    for(let idx in originalSetCards){
+      var carId = originalSetCards[idx];
+      var Card  = arrCards[carId];
+
+      var vCardNumber = Card.car_collector_number; //of collection
+      var vCardName   = Card.car_name;
+      var vCarCdnId   = Card.car_cdn_id;
+      var vCardType   = arrCardsName[vCarCdnId].car_type_line; //ex: Creature — Cat Beast
+      var vCardRarity = arrCardsName[vCarCdnId].car_rarity;
+      var vCardColors = arrCardsName[vCarCdnId].car_colors; //array
+
+      var valid = true;
+
+      // filter: card name
+      if(filters.card_name != null && filters.card_name != "" && valid){
+        var index = vCardName.toLowerCase().indexOf( filters.card_name.toLowerCase() );
+        if(index <= -1){
+          valid = false;
+        }
+      }
+      // =================
+
+      // filter: card number
+      if(filters.card_number != null && filters.card_number != "" && valid){
+        if(filters.card_number != vCardNumber){
+          valid = false;
+        }
+      }
+      // ===================
+
+      // filter: card color
+      if(filters.colors != null && filters.colors.length > 0 && valid){
+        var hasColor = false;
+
+        for(let idx in filters.colors){
+          var filterColor   = filters.colors[idx];
+          var arrCardColors = Array.from( vCardColors.replace(/[^a-zA-Z]+/g, "") );
+          var arrayEmpty    = true;
+
+          for(let idx2 in arrCardColors){
+            arrayEmpty = false;
+
+            var cardColor = arrCardColors[idx2];
+            if(cardColor == filterColor){
+              hasColor = true;
+              break;
+            }
+          }
+
+          // when tha card id COLORLESS, array is empty
+          if(arrayEmpty && filterColor == 'colorless'){
+            hasColor = true;
+            break;
+          }
+        }
+
+        valid = hasColor;
+      }
+      // ==================
+
+      // filter: card rarity
+      if(filters.rarity != null && filters.rarity.length && valid){
+        var hasRarity = false;
+
+        for(let idx in filters.rarity){
+          var filterRarity = filters.rarity[idx];
+          var index        = vCardRarity.toLowerCase().indexOf( filterRarity.toLowerCase() );
+          if(index >= 0){
+            hasRarity = true;
+            break;
+          }
+        }
+
+        valid = hasRarity;
+      }
+      // ===================
+
+      // filter: card type
+      if(filters.type != null && filters.type.length && valid){
+        var hasType = false;
+
+        for(let idx in filters.type){
+          var filterType = filters.type[idx];
+          var index      = vCardType.toLowerCase().indexOf( filterType.toLowerCase() );
+          if(index >= 0){
+            hasType = true;
+            break;
+          }
+        }
+
+        valid = hasType;
+      }
+      // =================
+
+      if(valid){
+        filteredCards.push(carId);
+      }
+    }
+
+    this.vSetCardsParts = [];
+    this.vSetCards      = [];
+
+    await this.spliceSetCards(filteredCards);
+    await this.loadCardsBySet();
   }
 }

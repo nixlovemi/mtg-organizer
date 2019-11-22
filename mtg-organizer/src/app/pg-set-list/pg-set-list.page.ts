@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { TbSetService } from '../TbSet/tb-set.service';
 import { LoadingController } from '@ionic/angular';
 import { Router, NavigationExtras } from '@angular/router';
+import { UtilsService } from '../utils.service';
 
 @Component({
   selector: 'app-pg-set-list',
@@ -9,7 +10,7 @@ import { Router, NavigationExtras } from '@angular/router';
   styleUrls: ['./pg-set-list.page.scss'],
 })
 export class PgSetListPage implements OnInit {
-
+  // @ViewChild('mySearchbar') searchbar: Searchbar;
   vSets       = [];
   vShowLoader = false;
 
@@ -17,59 +18,58 @@ export class PgSetListPage implements OnInit {
     public TbSet: TbSetService,
     public loadingCtr: LoadingController,
     private router: Router,
+    private utils: UtilsService,
   ) { }
 
-  ngOnInit() {
+  doRefresh(event)
+  {
+    setTimeout(() => {
+      // this.searchbar.clearInput(null);
+      this.loadAllSets();
+      event.target.complete();
+    }, 2000);
   }
 
-  ionViewDidEnter(){
-    this.loadingCtr.create({
-      message: 'Loading, please wait',
-      spinner: 'dots',
-    }).then((res) => {
-      res.present();
-
-      this.TbSet.getAllSets(50).then((arrSet:any) => {
-        this.vSets = arrSet.arraySets;
-      });
-
-      res.dismiss();
-      res.onDidDismiss().then((dis) => { });
-    });
+  async ngOnInit()
+  {
+    await this.loadAllSets();
   }
 
-  filterList(evt) {
+  async loadAllSets(count=50, filter='')
+  {
+    await this.utils.getLoader('Loading, please wait', 'dots');
+
+    var arrSet;
+    arrSet     = await this.TbSet.getAllSets(count, filter);
+    this.vSets = arrSet["arraySets"];
+
+    await this.utils.closeLoader();
+  }
+
+  async ionViewDidEnter(){ }
+
+  async filterList(evt)
+  {
     this.vShowLoader = true;
     const searchTerm = evt.srcElement.value;
 
     if (!searchTerm) {
-      this.TbSet.getAllSets(50).then((arrSet:any) => {
-        this.vSets = arrSet.arraySets;
-        this.vShowLoader = false;
-      });
-
+      await this.loadAllSets(50);
+      this.vShowLoader = false;
       return;
     }
 
-    this.filterSets(searchTerm).then((ret) => {
-      this.vShowLoader = false;
-    });
+    await this.loadAllSets(50, searchTerm);
+    this.vShowLoader = false;
   }
 
-  filterSets(filter){
-    return new Promise(
-    (resolve, reject) => {
-      this.TbSet.getAllSets(50, filter).then((arrSet:any) => {
-        this.vSets = arrSet.arraySets;
-        resolve(true);
-      })
-      .catch(() => {
-        resolve(false);
-      });
-    });
+  async filterSets(filter)
+  {
+    await this.loadAllSets(50, filter);
   }
 
-  detailSet(setId){
+  detailSet(setId)
+  {
     let navigationExtras: NavigationExtras = {
       state: {
         setId: setId

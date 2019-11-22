@@ -39,6 +39,7 @@ const routes: Routes = [
     path: 'set-details',
     loadChildren: './pg-set-details/pg-set-details.module#PgSetDetailsPageModule'
   },
+  { path: 'pg-filter-set-details', loadChildren: './pg-filter-set-details/pg-filter-set-details.module#PgFilterSetDetailsPageModule' },
 ];
 
 @NgModule({

@@ -101,10 +101,10 @@ export class AppComponent {
   }
 
   loadInfoGlobals(){
-    fetch('../../assets/data/cards.json').then(res => res.json()) .then(jsonCards => {
+    fetch('../../assets/data/cards.json').then(res => res.json()).then(jsonCards => {
       this.globalServ.setArrCards(jsonCards);
     });
-    fetch('../../assets/data/cards_name.json').then(res => res.json()) .then(jsonCardsName => {
+    fetch('../../assets/data/cards_name.json').then(res => res.json()).then(jsonCardsName => {
       this.globalServ.setArrCardsName(jsonCardsName);
     });
   }
