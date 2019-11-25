@@ -66,7 +66,21 @@ export class TbCardsService {
         if(Card.car_oracle_text != null){
           vOracleTxt = Card.car_oracle_text;
         } else {
-          vOracleTxt = '';
+          vOracleTxt        = '';
+          var jsonCardFaces = JSON.parse(Card.card_name.car_card_faces);
+
+          for(var iii=0; iii<jsonCardFaces.length; iii++){
+            var CardFace   = jsonCardFaces[iii];
+            var isCreature = CardFace.type_line.indexOf('Creature') >= 0;
+
+            if(isCreature){
+              vOracleTxt += 'Creature - ' + CardFace.oracle_text + ' ('+CardFace.power+'/'+CardFace.toughness+') // ';
+            } else {
+              vOracleTxt += CardFace.oracle_text + ' // ';
+            }
+          }
+
+          vOracleTxt = vOracleTxt.substr(0, vOracleTxt.length - 4);
         }
 
         this.SetSrv.getSetByTxt( Card.car_set ).then((Set:any) => {
@@ -129,17 +143,24 @@ export class TbCardsService {
   }
 
   getImageFromCardSymbol(cardSymbol){
-    var htmlRet = '';
-    var arrSym  = cardSymbol.split("}");
-    for(var i=0; i<arrSym.length; i++){
-      var txtSym = arrSym[i];
-      if(txtSym != ""){
-        txtSym  = txtSym.replace('{', '');
-        htmlRet = htmlRet + '<abbr class="card-symbol card-symbol-'+txtSym+'"></abbr>';
+    var htmlRet      = '';
+    var arrSplitCard = cardSymbol.split('//');
+    for(var i=0; i<arrSplitCard.length; i++){
+      var vCardS = arrSplitCard[i].trim();
+
+      var arrSym  = vCardS.split("}");
+      for(var ii=0; ii<arrSym.length; ii++){
+        var txtSym = arrSym[ii];
+        if(txtSym != ""){
+          txtSym  = txtSym.replace('{', '');
+          htmlRet = htmlRet + '<abbr class="card-symbol card-symbol-'+txtSym+'"></abbr>';
+        }
       }
+
+      htmlRet += '//';
     }
 
-    return htmlRet;
+    return htmlRet.substr(0, htmlRet.length - 2);
   }
 
   getCardColorClass(strCardColors){

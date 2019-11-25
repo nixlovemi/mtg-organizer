@@ -33,6 +33,7 @@ export class PgSetDetailsPage implements OnInit {
   vIdxCardsParts   = 0;
   vIdxCardsPartsMx = 0;
   vDisableInfinite = true;
+  vColSize         = 6;
 
   constructor(
     private route: ActivatedRoute,
@@ -162,12 +163,14 @@ export class PgSetDetailsPage implements OnInit {
       this.zone.run(() => {
         if(this.globalServ.getIsApp()){
           this.file.readAsDataURL(this.vSavePath + 'card_images/', cim_url_app).then((dataurl) => {
+            this.vColSize = 6;
             infoCard.path = dataurl;
             this.vSetCards.push(infoCard);
             resolve(true);
           })
           .catch((err) => {
             this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
+              this.vColSize = 12;
               infoCard.html = htmlCard;
               this.vSetCards.push(infoCard);
               resolve(true);
@@ -175,6 +178,7 @@ export class PgSetDetailsPage implements OnInit {
           });
         } else {
           this.TbCard.getHtmlCardId(cardId).then((htmlCard) => {
+            this.vColSize = 12;
             infoCard.html = htmlCard;
             this.vSetCards.push(infoCard);
             resolve(true);

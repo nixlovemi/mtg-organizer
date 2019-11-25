@@ -81,6 +81,7 @@ ion-split-pane{
   background: #000;
   width: 100%;
   max-width: 310px;
+  min-width: 310px;
   height: calc(width * 1.5);
 
   .inner {
@@ -195,6 +196,9 @@ ion-split-pane{
   }
 }
 // =============
+
+// NEW MAGIC CARD HTML
+// ===================
 
 .card-color-colorless{
   background-image:    url("../assets/magic_card_bg/colorless.jpg") !important;

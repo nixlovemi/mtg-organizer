@@ -33,7 +33,7 @@ flip
 
 <ion-content>
   <ion-row>
-    <ion-col size="6" align-self-center text-center *ngFor="let c of vSetCards">
+    <ion-col [size]="vColSize" align-self-center text-center *ngFor="let c of vSetCards">
       <img class="magic-card" *ngIf="c.html == ''" (click)="showImage(c.path, c.name)" src="{{c.path}}" />
       <div *ngIf="c.html != ''" [innerHTML]="c.html" (click)="showImage(c.id, c.name)"></div>
     </ion-col>
