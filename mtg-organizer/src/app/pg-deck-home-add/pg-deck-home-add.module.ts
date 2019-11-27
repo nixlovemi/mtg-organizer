@@ -5,12 +5,12 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { PgDecksPage } from './pg-decks.page';
+import { PgDeckHomeAddPage } from './pg-deck-home-add.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: PgDecksPage
+    component: PgDeckHomeAddPage
   }
 ];
 
@@ -21,6 +21,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [PgDecksPage]
+  declarations: [PgDeckHomeAddPage]
 })
-export class PgDecksPageModule {}
+export class PgDeckHomeAddPageModule {}

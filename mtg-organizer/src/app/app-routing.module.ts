@@ -16,10 +16,6 @@ const routes: Routes = [
     loadChildren: './pg-card-list/pg-card-list.module#PgCardListPageModule'
   },
   {
-    path: 'decks',
-    loadChildren: './pg-decks/pg-decks.module#PgDecksPageModule'
-  },
-  {
     path: 'collection',
     loadChildren: './pg-collection/pg-collection.module#PgCollectionPageModule'
   },
@@ -39,7 +35,19 @@ const routes: Routes = [
     path: 'set-details',
     loadChildren: './pg-set-details/pg-set-details.module#PgSetDetailsPageModule'
   },
-  { path: 'pg-filter-set-details', loadChildren: './pg-filter-set-details/pg-filter-set-details.module#PgFilterSetDetailsPageModule' },
+  {
+    path: 'pg-filter-set-details',
+    loadChildren: './pg-filter-set-details/pg-filter-set-details.module#PgFilterSetDetailsPageModule'
+  },
+  {
+    path: 'pg-deck-home',
+    loadChildren: './pg-deck-home/pg-deck-home.module#PgDeckHomePageModule'
+  },
+  {
+    path: 'pg-deck-home-detail/:deck_id',
+    loadChildren: './pg-deck-home-detail/pg-deck-home-detail.module#PgDeckHomeDetailPageModule'
+  },
+  { path: 'pg-deck-home-add', loadChildren: './pg-deck-home-add/pg-deck-home-add.module#PgDeckHomeAddPageModule' },
 ];
 
 @NgModule({

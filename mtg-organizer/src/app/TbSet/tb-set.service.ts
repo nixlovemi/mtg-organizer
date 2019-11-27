@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Http } from '@angular/http';
+import { GlobalsService } from '../globals.service';
 import * as moment from 'moment';
 
 @Injectable({
@@ -12,34 +13,8 @@ export class TbSetService {
   constructor(
     public storage: Storage,
     public http: Http,
-  ) {
-    this.loadSetsIntoArray();
-  }
-
-  loadSetsIntoArray()
-  {
-    fetch('../../assets/data/sets.json')
-    .then(res => res.json())
-    .then(jsonSet => {
-      var arrSetKeys = Object.keys(jsonSet);
-      for(var i=0; i<arrSetKeys.length; i++){
-        var setKey = arrSetKeys[i];
-        var Set    = jsonSet[setKey];
-
-        this.arrSets.push(Set);
-      }
-
-      this.orderSets();
-    });
-  }
-
-  async orderSets()
-  {
-    function date_sort(a, b) {
-      return new Date(b.set_released_at).getTime() - new Date(a.set_released_at).getTime();
-    }
-    await this.arrSets.sort(date_sort);
-  }
+    public GlobSrv: GlobalsService
+  ) { }
 
   getAllSets(limit=5, filter=''){
     return new Promise(
@@ -48,11 +23,11 @@ export class TbSetService {
         "arraySets" : [],
         "count"     : 0,
       };
-      let arraySets = [];
+      let arraySets  = [];
+      let globArrSet = this.GlobSrv.getArrSet();
 
-      for(let idx in this.arrSets){
-        var Set = this.arrSets[idx];
-
+      for(let idx in globArrSet){
+        var Set = globArrSet[idx];
         if(Set.set_card_count > 0){
           var vSetName = Set.set_name;
           var vFiltered = true;
@@ -79,7 +54,7 @@ export class TbSetService {
       }
 
       arrayRet.arraySets = arraySets;
-      arrayRet.count     = this.arrSets.length;
+      arrayRet.count     = globArrSet.length;
       resolve(arrayRet);
     });
   }

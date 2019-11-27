@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="menu-toolbar-default" slot="icon-only" (click)="closeModal()">
+        <ion-icon item-right name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Add New Deck
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <fieldset>
+    <legend>Deck info</legend>
+
+    <ion-grid>
+      <ion-row align-items-start>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="stacked">Deck Name</ion-label>
+            <ion-input [(ngModel)]="vDeckName" value=""></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Format</ion-label>
+            <ion-select [(ngModel)]="vDeckFormat" cancelText="Close" okText="Select">
+              <ion-select-option value="standard">Standard</ion-select-option>
+              <ion-select-option value="pioneer">Pioneer</ion-select-option>
+              <ion-select-option value="modern">Modern</ion-select-option>
+              <ion-select-option value="legacy">Legacy</ion-select-option>
+              <ion-select-option value="pauper">Pauper</ion-select-option>
+              <ion-select-option value="vintage">Vintage</ion-select-option>
+              <ion-select-option value="commander">Commander</ion-select-option>
+              <ion-select-option value="brawl">Brawl</ion-select-option>
+              <ion-select-option value="future">Future</ion-select-option>
+              <ion-select-option value="historic">Historic</ion-select-option>
+              <ion-select-option value="penny">Penny</ion-select-option>
+              <ion-select-option value="duel">Duel</ion-select-option>
+              <ion-select-option value="oldschool">Oldschool</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row style="padding-top: 30px;" align-items-start>
+        <ion-col size="12" class="ion-text-center">
+          <ion-button (click)="saveDeck()" fill="outline" class="collection-open-button">Save</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </fieldset>
+</ion-content>

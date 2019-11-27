@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { Storage } from '@ionic/storage';
 import { UtilsService } from '../utils.service';
 import { TbSetService } from '../TbSet/tb-set.service';
+import { TbDeckService } from '../TbDeck/tb-deck.service';
 import { Router, NavigationExtras } from '@angular/router';
 
 @Component({
@@ -21,16 +22,30 @@ export class PgHomePage implements OnInit {
     public storage: Storage,
     public utils: UtilsService,
     public TbSet: TbSetService,
+    public TbDeck: TbDeckService,
     private router: Router,
   ) { }
 
-  ngOnInit() {
+  ngOnInit()
+  {
+    this.loadHomePage();
   }
 
-  ionViewDidEnter(){
-    this.vDecks = [];
+  ionViewDidEnter(){ }
 
-    var deck1 = {
+  async loadHomePage()
+  {
+    this.vDecks      = [];
+    var jsonDecks    = await this.TbDeck.getDeckData();
+    var arrDecks:any = JSON.parse(jsonDecks + '');
+    if(arrDecks != null){
+      for(let idx in arrDecks){
+        var Deck = arrDecks[idx];
+        this.vDecks.push(Deck);
+      }
+    }
+
+    /*var deck1 = {
       "id":1,
       "format":"standard",
       "title":"Mono Red Aggro",
@@ -60,28 +75,37 @@ export class PgHomePage implements OnInit {
       "main":60,
       "side":14,
     };
-    this.vDecks.push(deck2);
+    this.vDecks.push(deck2);*/
 
     // test sets
-    this.TbSet.getAllSets().then((arrSet:any) => {
-      this.vSets = arrSet.arraySets;
-      if(arrSet.count > 5){
-        this.vShowMoreSets = true;
-      }
-    });
+    var arrSet:any = await this.TbSet.getAllSets();
+    this.vSets     = arrSet.arraySets;
+    if(arrSet.count > 5){
+      this.vShowMoreSets = true;
+    }
     // =========
   }
 
-  viewDeck(deckId){
+  viewDeck(deckId)
+  {
     console.log(deckId);
   }
 
-  detailSet(setId){
+  detailSet(setId)
+  {
     let navigationExtras: NavigationExtras = {
       state: {
         setId: setId
       }
     };
     this.router.navigate(['set-details'], navigationExtras);
+  }
+
+  async refreshHome(event)
+  {
+    await this.utils.getLoader('Loading, please wait', 'dots');
+    await this.loadHomePage();
+    await this.utils.closeLoader();
+    event.target.complete();
   }
 }

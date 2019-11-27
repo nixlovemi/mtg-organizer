@@ -5,6 +5,7 @@ import { File } from '@ionic-native/file/ngx';
   providedIn: 'root'
 })
 export class GlobalsService {
+  arrSet          = [];
   arrCards        = [];
   arrCardsName    = [];
   arrGlobSetCards = [];
@@ -13,6 +14,14 @@ export class GlobalsService {
   constructor(
     private file: File,
   ) { }
+
+  setArrSet(arrSet){
+    this.arrSet = arrSet;
+  }
+
+  getArrSet(){
+    return this.arrSet;
+  }
 
   setArrCards(arrCards){
     this.arrCards = arrCards;

@@ -13,6 +13,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { File } from '@ionic-native/file/ngx';
 import { ImageViewerComponent } from './component/image-viewer/image-viewer.component';
 import { PgFilterSetDetailsPageModule } from './pg-filter-set-details/pg-filter-set-details.module';
+import { PgDeckHomeAddPageModule } from './pg-deck-home-add/pg-deck-home-add.module';
 import { Zip } from '@ionic-native/zip/ngx';
 
 @NgModule({
@@ -24,7 +25,8 @@ import { Zip } from '@ionic-native/zip/ngx';
     AppRoutingModule,
     HttpModule,
     PgFilterSetDetailsPageModule,
-    IonicStorageModule.forRoot({ name: '__mydb', driverOrder: ['sqlite', 'websql', 'indexeddb'] }),
+    PgDeckHomeAddPageModule,
+    IonicStorageModule.forRoot(),
   ],
   providers: [
     StatusBar,

@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PgDecksPage } from './pg-decks.page';
+import { PgDeckHomeDetailPage } from './pg-deck-home-detail.page';
 
-describe('PgDecksPage', () => {
-  let component: PgDecksPage;
-  let fixture: ComponentFixture<PgDecksPage>;
+describe('PgDeckHomeDetailPage', () => {
+  let component: PgDeckHomeDetailPage;
+  let fixture: ComponentFixture<PgDeckHomeDetailPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PgDecksPage ],
+      declarations: [ PgDeckHomeDetailPage ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PgDecksPage);
+    fixture = TestBed.createComponent(PgDeckHomeDetailPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
