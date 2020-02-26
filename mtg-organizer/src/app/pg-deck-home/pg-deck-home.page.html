@@ -19,6 +19,7 @@
           <legend>List</legend>
           <ion-grid>
             <ion-row align-items-start>
+              <span style="margin-top: 10px;" *ngIf="vDecks.length <= 0">No decks yet ..</span>
               <ion-col size="12">
                 <ion-item *ngFor="let d of vDecks" [routerLink]="'/pg-deck-home-detail/'+d.id" routerDirection="forward" detail>
                   <ion-label text-wrap>

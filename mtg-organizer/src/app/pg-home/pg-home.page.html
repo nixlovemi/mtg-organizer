@@ -22,6 +22,7 @@
           <ion-grid>
             <ion-row align-items-start>
               <ion-col size="12">
+                <span style="margin-top: 10px;" *ngIf="vDecks.length <= 0">No decks yet ..</span>
                 <ion-item *ngFor="let d of vDecks" (click)="viewDeck(d.id)" detail>
                   <ion-label text-wrap>
                     <h2 class="my-deck-title">

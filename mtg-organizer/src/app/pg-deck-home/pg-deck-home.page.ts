@@ -24,6 +24,10 @@ export class PgDeckHomePage implements OnInit {
     this.events.subscribe('reloadMyDecks', () => {
       this.loadDecks();
     });
+    this.events.subscribe('deckHomeOpenDeck', (deckId) => {
+      console.log(deckId);
+      this.router.navigate(['/pg-deck-home-detail/' + deckId], {});
+    });
     await this.loadDecks();
   }
 

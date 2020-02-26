@@ -5,6 +5,7 @@ import { UtilsService } from '../utils.service';
 import { TbSetService } from '../TbSet/tb-set.service';
 import { TbDeckService } from '../TbDeck/tb-deck.service';
 import { Router, NavigationExtras } from '@angular/router';
+import { Events } from '@ionic/angular';
 
 @Component({
   selector: 'app-pg-home',
@@ -24,6 +25,7 @@ export class PgHomePage implements OnInit {
     public TbSet: TbSetService,
     public TbDeck: TbDeckService,
     private router: Router,
+    private events: Events,
   ) { }
 
   ngOnInit()
@@ -88,7 +90,8 @@ export class PgHomePage implements OnInit {
 
   viewDeck(deckId)
   {
-    console.log(deckId);
+    this.router.navigate(['/pg-deck-home'], {});
+    this.events.publish('deckHomeOpenDeck', deckId);
   }
 
   detailSet(setId)

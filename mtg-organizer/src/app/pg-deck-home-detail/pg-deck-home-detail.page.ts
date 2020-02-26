@@ -12,7 +12,7 @@ import { UtilsService } from '../utils.service';
 export class PgDeckHomeDetailPage implements OnInit {
   deckTitle = '';
   deckId    = 0;
-  vDeck     = null;
+  vDeck     = [];
 
   constructor(
     public TbDeck: TbDeckService,
